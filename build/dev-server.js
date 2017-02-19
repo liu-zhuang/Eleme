@@ -23,6 +23,38 @@ var proxyTable = config.dev.proxyTable
 var app = express()
 var compiler = webpack(webpackConfig)
 
+// 获取Mock数据
+var appMockData = require('../data.json');
+var sellerData = appMockData.seller;
+var goodsData = appMockData.goods;
+var ratingsData = appMockData.ratings;
+// 定义路由
+var apiRoutes = express.Router();
+// 定义访问seller时返回的数据
+apiRoutes.get('/seller',function(req,res){
+  res.json({
+    errno:0,
+    data:sellerData
+  });
+});
+// 定义访问goods时返回的数据
+apiRoutes.get('/goods',function(req,res){
+  res.json({
+    errno:0,
+    data:goodsData
+  });
+});
+// 定义访问ratings路由时的数据
+apiRoutes.get('/ratings',function(req,res){
+  res.json({
+    errno:0,
+    data:ratingsData
+  });
+});
+// 使用这个路由  路径为api/goods 或api/seller api/ratings
+app.use('/api',apiRoutes);
+
+
 var devMiddleware = require('webpack-dev-middleware')(compiler, {
   publicPath: webpackConfig.output.publicPath,
   quiet: true
