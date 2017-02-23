@@ -22,6 +22,9 @@ module.exports = {
     // allow async-await
     'generator-star-spacing': 0,
     // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
+    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
+    'semi': ['error','always'],// 强制使用分号，否则报错
+    'indent':0,// 不check 缩进
+    'no-tabs':0,// 不check no-tabs也就是允许使用tab缩进
   }
 }
