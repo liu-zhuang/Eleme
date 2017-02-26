@@ -19,13 +19,23 @@
 					<span class="support-content">{{seller.supports[0].description}}</span>
 				</div>
 			</div>
-			<div v-if="seller.supports" class="support-count">
+			<div v-if="seller.supports" class="support-count" @click="showDetail">
 				<span>{{seller.supports.length}}个</span>
 				<span class="icon-keyboard_arrow_right"></span>
 			</div>
 		</div>
 		<!-- 公告区域 -->
-		<div class="bulletin-wrapper"></div>
+		<div class="bulletin-wrapper">
+			<span class="bulletin-icon"></span>
+			<span class="bulletin-content">{{seller.bulletin}}</span>
+			<span class="icon-keyboard_arrow_right" @click="showDetail"></span>
+		</div>
+		<div class="background">
+			<img :src="seller.avatar" width="100%" height="100%">
+		</div>
+		<div v-show="detailShow" class="detail">
+			this is detail info.....
+		</div>
 	</div>
 </template>
 
@@ -37,7 +47,15 @@
 			getIconByType: function (type) {
 				var classList = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
 				return classList[type];
+			},
+			showDetail: function () {
+				this.detailShow = true;
 			}
+		},
+		data: function () {
+			return {
+				detailShow: false
+			};
 		}
 	};
 </script>
@@ -45,8 +63,9 @@
 <style lang="less" rel="stylesheet/less">
 	.header	{
 		color:#fff;
-		background-color: #ccc;
-		font-size:0;
+		overflow: hidden;
+		position: relative;
+		background:rgba(7,17,27,0.5); 
 	}
 	.content-wrapper {
 		padding:24px 12px 18px 24px;
@@ -147,5 +166,62 @@
 	.icon-keyboard_arrow_right {
 		line-height: 24px;
 	}
-	
+
+	.background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: -1;
+		filter:blur(10px);
+	}
+	.bulletin-wrapper {
+		position: relative;
+		// width:100%;
+		height: 28px;
+		padding: 0 22px 0 12px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow:ellipsis;
+		-o-text-overflow:ellipsis;
+		-webkit-text-overflow:ellipsis;
+		-moz-text-overflow:ellipsis;
+		vertical-align: top;
+		background: rgba(7,17,27,0.2);
+	}
+	.bulletin-wrapper .icon-keyboard_arrow_right {
+		position: absolute;
+		right: 12px;
+		top:8px;
+		font-size: 10px;
+		vertical-align: top;
+	}
+	.bulletin-icon {
+		display:inline-block;
+		background-image: url('bulletin@2x.png');
+		width:22px;
+		height: 12px;
+		-moz-background-size:100% 100%;
+		background-size:100% 100%;
+		-webkit-background-size:100% 100%;
+		vertical-align: top;
+		margin-top: 8px;
+	}
+	.bulletin-content {
+		font-size: 10px;
+		color:rgb(255,255,255);
+		font-weight: 200;
+		line-height: 28px;
+	}
+
+	.detail {
+		position: fixed;
+		height: 100%;
+		width: 100%;
+		left:0;
+		top:0;
+		background: rgba(7,17,27,0.8);
+		filter:blur(10px);
+	}
 </style>
