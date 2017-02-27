@@ -6,9 +6,12 @@
 			<div class="avatar">
 				<img :src="seller.avatar" width="64" height="64">
 			</div>
+			<!-- 内容 -->
 			<div class="content">
 				<div class="title">
+					<!-- 品牌图标 -->
 					<span class="brand"></span>
+					<!-- 商家名称/ -->
 					<span class="name">{{seller.name}}</span>
 				</div>
 				<div class="desc">
@@ -30,24 +33,60 @@
 			<span class="bulletin-content">{{seller.bulletin}}</span>
 			<span class="icon-keyboard_arrow_right" @click="showDetail"></span>
 		</div>
+		<!-- header的背景 -->
+		<!-- 商家avatar全屏模糊处理 -->
 		<div class="background">
 			<img :src="seller.avatar" width="100%" height="100%">
 		</div>
-		<div v-show="detailShow" class="detail">
-			<div class="detail-wrapper clearfix">
-				<div class="detail-content">
+		<!-- 查看详情内容 -->
+		<transition name="fade">
+			<div v-show="detailShow" class="detail">
+				<div class="detail-wrapper clearfix">
+					<div class="detail-content">
+						<h1 class="detail-name">
+							{{seller.name}}
+						</h1>
+						<div class="star-wrapper">
+							<star :starSize="48" :score="seller.score"></star>
+						</div>
+						<div class="detail-support">
+							<div class="support-line"></div>
+							<div class="support-title">优惠信息</div>
+							<div class="support-line"></div>
+						</div>
+						<div class="support-content-detail">
+							<ul v-if="seller.supports">
+								<li v-for="support in seller.supports" class="support-li">
+									<span class="support-icon" :class="getIconByType(support.type)"></span>
+									<span class="support-content">{{support.description}}</span>
+								</li>
+							</ul>
+						</div>
+						<div class="detail-support">
+							<div class="support-line"></div>
+							<div class="support-title">商家公告</div>
+							<div class="support-line"></div>
+						</div>
+						<div class="bulletin-content-detail">
+							{{seller.bulletin}}
+						</div>
+					</div>
+				</div>
+				<!-- stick footer -->
+				<!-- 关闭按钮 -->
+				<div class="detail-footer" @click="closeDetail">
+					<i class="icon-close"></i>
 				</div>
 			</div>
-			<div class="detail-footer">
-				<i class="icon-close"></i>
-			</div>
-		</div>
+		</transition>
 	</div>
 </template>
 
 <script>
+	import star from '../star/star';
 	export default {
 		name: 'header',
+		components: { star },
 		props: ['seller'],
 		methods: {
 			getIconByType: function (type) {
@@ -56,6 +95,9 @@
 			},
 			showDetail: function () {
 				this.detailShow = true;
+			},
+			closeDetail: function () {
+				this.detailShow = false;
 			}
 		},
 		data: function () {
@@ -152,6 +194,7 @@
 		font-weight: 200;
 		line-height: 12px;
 		vertical-align: top;
+
 	}
 
 	.support-count {
@@ -230,10 +273,12 @@
 		top:0;
 		background: rgba(7,17,27,0.8);
 		overflow: auto;
+		backdrop-filter:blur(10px);
 	}
 
 	.detail-wrapper {
 		min-height: 100%;
+		width:100%;
 		overflow: auto;
 	}
 
@@ -249,4 +294,61 @@
 		clear:both;
 		font-size: 32px;
 	}
+	.detail-name {
+		height: 16px;
+		font-size: 16px;
+		font-weight: 700;
+		color:rgb(255,255,255);
+		line-height: 16px;
+		text-align: center;
+	}
+	.star-wrapper {
+		text-align: center;
+		margin: 16px auto 28px auto;
+		padding:2px 0;
+	}
+	.detail-support {
+		width:80%;
+		display: flex;
+		margin: 0 auto 24px auto;
+		.support-line {
+			flex:1;
+			position: relative;
+			top:-6px;
+			border-bottom: rgba(255,255,255,0.2) 1px solid;
+		}
+		.support-title {
+			padding: 0 12px;
+			font-size: 14px;
+			font-weight: 700;
+		}
+	}
+	.support-content-detail {
+		font-size: 10px;
+		color:rgb(255,255,255);
+		font-weight: 200;
+		line-height: 12px;
+		vertical-align: top;
+		width:80%;
+		margin: 0 auto 28px auto;
+	}
+	.support-li {
+		margin-bottom: 15px;
+	}
+	.bulletin-content-detail {
+		width:80%;
+		margin: 0 auto;
+		padding: 0 12px 0 12px;
+		font-size: 12px;
+		font-weight: 200;
+		line-height: 24px;
+		color:rgb(255,255,255);
+	}
+	.fade-enter-active, .fade-leave-active {
+		transition: opacity .5s
+	}
+	.fade-enter, .fade-leave-active {
+		opacity: 0
+	}
 </style>
+
