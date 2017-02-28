@@ -18,7 +18,7 @@
 					{{seller.description}}/{{seller.deliveryTime}}分钟送达
 				</div>
 				<div class="support" v-if="seller.supports">
-					<span class="support-icon" :class="getIconByType(seller.supports[0].type)"></span>
+					<support :supportType="seller.supports[0].type" :iconSize="2"></support>
 					<span class="support-content">{{seller.supports[0].description}}</span>
 				</div>
 			</div>
@@ -57,7 +57,8 @@
 						<div class="support-content-detail">
 							<ul v-if="seller.supports">
 								<li v-for="support in seller.supports" class="support-li">
-									<span class="support-icon" :class="getIconByType(support.type)"></span>
+									<!-- <span class="support-icon" :class="getIconByType(support.type)"></span> -->
+									<support :supportType="support.type" :iconSize="2"></support>
 									<span class="support-content">{{support.description}}</span>
 								</li>
 							</ul>
@@ -84,9 +85,10 @@
 
 <script>
 	import star from '../star/star';
+	import support from '../support/support';
 	export default {
 		name: 'header',
-		components: { star },
+		components: { star, support },
 		props: ['seller'],
 		methods: {
 			getIconByType: function (type) {
@@ -165,36 +167,12 @@
 		vertical-align: top;
 	}
 
-	.support-icon {
-		display: inline-block;
-		width:12px;
-		height: 12px;
-		-moz-background-size:100% 100%;
-		background-size:100% 100%;
-		-webkit-background-size:100% 100%;
-	}
-	.decrease {
-		background-image: url("decrease_1@2x.png");
-	}
-	.discount {
-		background-image: url("discount_1@2x.png");
-	}
-	.guarantee {
-		background-image: url("guarantee_1@2x.png");
-	}
-	.invoice {
-		background-image: url("invoice_1@2x.png");
-	}
-	.special {
-		background-image: url("special_1@2x.png");
-	}
 	.support-content {
-		font-size: 10px;
+		font-size: 14px;
 		color:rgb(255,255,255);
 		font-weight: 200;
-		line-height: 12px;
+		line-height: 14px;
 		vertical-align: top;
-
 	}
 
 	.support-count {

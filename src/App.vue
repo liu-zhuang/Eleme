@@ -24,7 +24,6 @@
 
 <script>
   import header from './components/header/header';
-
   export default {
     components: { 'v-header': header },
     data: function () {
@@ -34,11 +33,15 @@
     },
     mounted: function () {
       this.$nextTick(function () {
-        this.axios.get('/api/seller')
+        var url = '/api/seller';
+        // var url = 'http://liuzhuang.tech/eleme/data.json';
+        this.axios.get(url)
         .then(res => {
           if (res.data.errno === 0) {
             this.seller = res.data.data;
           }
+          // console.log(JSON.stringify(res.data.seller));
+          // this.seller = res.data.seller;
         })
         .catch(function () {
           console.log('axios error...');
