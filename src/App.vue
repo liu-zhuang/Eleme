@@ -17,7 +17,7 @@
      </div>
    </section>
    <section>
-    <router-view></router-view>
+    <router-view :seller="seller"></router-view>
   </section>
 </div>
 </template>
@@ -33,14 +33,18 @@
     },
     mounted: function () {
       this.$nextTick(function () {
+        // 开发
         var url = '/api/seller';
+        // 生产
         // var url = 'http://liuzhuang.tech/eleme/data.json';
         this.axios.get(url)
         .then(res => {
+          // 开发
           if (res.data.errno === 0) {
             this.seller = res.data.data;
           }
           // console.log(JSON.stringify(res.data.seller));
+          // 生产
           // this.seller = res.data.seller;
         })
         .catch(function () {
