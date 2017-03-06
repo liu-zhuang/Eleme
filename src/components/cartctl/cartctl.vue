@@ -8,7 +8,7 @@
 		<transition name="tran-de">
 			<div class="cnt" v-show="showDecrease">{{food.cnt}}</div>
 		</transition>
-		<div class="add" @click="cartAdd($event)">
+		<div class="add" @click.stop.prevent="cartAdd($event)">
 			<i class="icon-add_circle"></i>
 		</div>
 	</div>
@@ -24,7 +24,7 @@
 		methods: {
 			cartAdd: function (event) {
 				if (!event._constructed) {
-					return false;
+					return;
 				}
 				if (this.food.cnt) {
 					this.food.cnt ++;
@@ -35,7 +35,7 @@
 			},
 			cartDecrease: function (event) {
 				if (!event._constructed) {
-					return false;
+					return;
 				}
 				this.food.cnt --;
 			}

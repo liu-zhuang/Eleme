@@ -1,9 +1,9 @@
 <template>
 	<div class="shopcart">
 		<div class="cartWrapper">
-			<div class="content-left">
+			<div class="content-left" @click="toggleCartList">
 				<div class="cartImg">
-					<div class="imgWrapper" @click="viewCart" :class="{highlight:cartCnt>0}">
+					<div class="imgWrapper"  :class="{highlight:cartCnt>0}">
 						<i class="icon-shopping_cart"></i>
 					</div>
 					<div v-show="cartCnt>0" class="cart-cnt">
@@ -17,20 +17,34 @@
 					另需配送费{{deliveryPrice | currency | unit}}
 				</div>
 			</div>
-			<div class="content-rigth" :class="{highlight:leftPrice<=0}">{{cartDesc}}</div>
+			<div class="content-rigth" @click="calcCart" :class="{highlight:leftPrice<=0}">{{cartDesc}}</div>
 		</div>
-		<div class="ball-container">
-			<div v-for="ball in balls">
-				<transition name="drop" @before-enter="beforeDrop" @enter="dropping" @after-enter="afterDrop">
-					<div class="ball" v-show="ball.show">
-						<div class="inner inner-hook"></div>
-					</div>
-				</transition>
+		<transition name="fold">
+			<div class="cartList" v-show="listShow">
+				<div class="header">
+					<h2 class="title">购物车</h2>
+					<div class="space"></div>
+					<span class="clearCart" @click="clearCart">清空</span>
+				</div>
+				<div class="content-wrapper" ref="listContent">
+					<ul  >
+						<li v-for="food in selectedFood" class="food">
+							{{food.name}}
+							<span class="foodprice">{{food.price*food.cnt | currency}}</span>
+							<div class="cartctl-wrapper">
+								<cartctl class="cartctl" :food="food"></cartctl>
+							</div>
+						</li>
+					</ul>
+				</div>
 			</div>
-		</div>
+		</transition>
+		<div class="listmask" v-show="listShow" @click="fold=true"></div>
 	</div>
 </template>
 <script>
+	import cartctl from '../cartctl/cartctl';
+	import BScroll from 'better-scroll';
 	export default {
 		// props: ['minPrice', 'deliveryPrice', 'selectedFood'],
 		props: {
@@ -45,27 +59,11 @@
 				defautl: []
 			}
 		},
+		components: {cartctl},
 		data: function () {
 			return {
 				leftPrice: this.minPrice,
-				balls: [
-				{
-					show: false
-				},
-				{
-					show: false
-				},
-				{
-					show: false
-				},
-				{
-					show: false
-				},
-				{
-					show: false
-				}
-				],
-				dropBalls: []
+				fold: true
 			};
 		},
 		filters: {
@@ -101,58 +99,43 @@
 				}
 				this.leftPrice = calcPrice;
 				return ret;
+			},
+			listShow: function () {
+				if (this.totalPrice === 0) {
+					this.fold = true;
+					return false;
+				}
+				return !this.fold;
 			}
 		},
 		methods: {
-			viewCart: function () {
-			},
 			dropBall: function (el) {
-				for (let i = 0; i < this.balls.length; i++) {
-					let ball = this.balls[i];
-					if (!ball.show) {
-						ball.show = true;
-						ball.el = el;
-						this.dropBalls.push(ball);
-						return;
-					}
-				}
+				// todo: 小球抛下动画
+				console.log('dropball...');
 			},
-			beforeDrop: function (el) {
-				let count = this.balls.length;
-				while (count--) {
-					let ball = this.balls[count];
-					if (ball.show) {
-						let rect = ball.el.getBoundingClientRect();
-						let x = rect.left - 32;
-						let y = -(window.innerHeight - rect.top - 22);
-						el.style.display = '';
-						el.style.webkitTransform = `translate3d(0,${y}px,0)`;
-						el.style.transform = `translate3d(0,${y}px,0)`;
-						let inner = el.getElementsByClassName('inner-hook')[0];
-						inner.style.webkitTransform = `translate3d(${x}px,0,0)`;
-						inner.style.transform = `translate3d(${x}px,0,0)`;
-						console.log(el);
-						console.log(inner);
-					}
+			toggleCartList: function () {
+				if (this.totalPrice === 0) {
+					return;
 				}
-			},
-			dropping: function (el, done) {
-				/* eslint-disable no-unused-vars */
-				let rf = el.offsetHeight;
+				this.fold = !this.fold;
 				this.$nextTick(() => {
-					el.style.webkitTransform = 'translate3d(0,0,0)';
-					el.style.transform = 'translate3d(0,0,0)';
-					let inner = el.getElementsByClassName('inner-hook')[0];
-					inner.style.webkitTransform = 'translate3d(0,0,0)';
-					inner.style.transform = 'translate3d(0,0,0)';
-					el.addEventListener('transitionend', done);
+					if (!this.listScroll) {
+						this.listScroll = new BScroll(this.$refs.listContent, {
+							click: true
+						});
+					} else {
+						this.listScroll.refresh();
+					}
 				});
 			},
-			afterDrop: function (el) {
-				let ball = this.dropBalls.shift();
-				if (ball) {
-					ball.show = false;
-					el.style.display = 'none';
+			clearCart: function () {
+				this.selectedFood.forEach(food => {
+					food.cnt = 0;
+				});
+			},
+			calcCart: function () {
+				if (this.totalPrice > this.minPrice) {
+					alert('需支付' + this.totalPrice + '元');
 				}
 			}
 		}
@@ -166,11 +149,13 @@
 		bottom:0;
 		left:0;
 		width:100%;
-		z-index: 10;
+		z-index: 50;
 		.cartWrapper {
 			display: flex;
 			.content-left {
 				flex: 1;
+				font-size: 0;
+				z-index: 45;
 				.cartImg {
 					display: inline-block;
 					vertical-align: top;
@@ -235,6 +220,7 @@
 					font-size: 12px;
 					color:rgba(255,255,255,0.4);
 					margin-top: 12px;
+					margin-left:6px;
 					line-height: 24px;
 				}
 			}
@@ -248,26 +234,93 @@
 				line-height: 56px;
 				height: 56px;
 				background: rgb(32,38,45);
+				z-index: 45;
 				&.highlight {
 					background-color: rgb(69,209,79);
 					color:rgb(255,255,255);
 				}
 			}
-			.ball {
-				position: fixed;
-				left: 32px;
-				bottom: 22px;
-				z-index: 200;
-				// transition: all 5s cubic-bezier(0.49, -0.29, 0.75, 0.41);
-				transition: all 5s;
-				.inner{
-					width: 16px;
-					height: 16px;
-					border-radius: 50%;
-					background: rgb(0, 160, 220);
-					transition: all 0.4s linear;
+		}
+		.cartList {
+			width:100%;
+			position: absolute;
+			left:0;
+			top:0;
+			z-index: 40;
+			transform: translate3d(0,-100%,0);
+			.header {
+				height:40px;
+				width:100%;
+				background-color: #f3f5f7;
+				border-bottom: 2px solid rgba(7,17,27,0.1);
+				display: flex;
+				.title {
+					font-size: 14px;
+					font-weight: 200;
+					color:rgb(7,17,27);
+					line-height: 40px;
+					margin-left: 18px;
+				}
+				.space {
+					flex:1;
+				}
+				.clearCart {
+					font-size: 14px;
+					color: rgb(0,160,220);
+					line-height: 40px;
+					align-self: flex-end;
+					margin-right: 18px;
+				}				
+			}
+			.content-wrapper {
+				background-color: #fff;
+				overflow: hidden;
+				padding:0 18px;
+				max-height: 217px;
+				.food {
+					padding: 12px 0;
+					box-sizing: border-box;
+					font-size: 14px;
+					color:rgb(7,17,27);
+					line-height: 24px;
+					position: relative;
+					.foodprice {
+						font-size: 10px;
+						font-weight: 700;
+						color:rgb(240,20,20);
+						line-height: 24px;
+						height: 24px;
+						position: absolute;
+						right:100px;
+					}
+					.cartctl-wrapper {
+						position: absolute;
+						right: 0;
+						bottom:6px;
+						.cartctl {
+							font-size: 24px;
+							color:rgb(0,160,220);
+						}
+					}
 				}
 			}
+		}
+		.fold-enter-active, .fold-leave-active {
+			transition: all .5s;
+		}
+		.fold-enter, .fold-leave-active {
+			transform: translate3d(0,0,0);
+		}
+		.listmask {
+			width:100%;
+			height: 100%;
+			position: fixed;
+			top:0;
+			left:0;
+			background:rgba(7,17,27,0.6);
+			filter:blur(10px);
+			z-index:30;
+
 		}
 	}
 </style>
