@@ -13,10 +13,10 @@
 					<h4 class="good-name">{{good.name}}</h4>
 					<ul class="foodList">
 						<li v-for="food in good.foods" class="food">
-							<div class="food-icon" >
+							<div class="food-icon" @click="viewFoodDetail(food)">
 								<img width="57px" height="57px" :src="food.icon" alt="">
 							</div>
-							<div class="food-wrapper">
+							<div class="food-wrapper" >
 								<h2 class="foodName">{{food.name}}</h2>
 								<p v-show="food.description" class="foodDesc">{{food.description}}</p>
 								<div class="extra">
@@ -34,7 +34,7 @@
 									<span v-show="food.oldPrice" class="old">
 										{{food.oldPrice | filterCurrency}}
 									</span>
-									<cartctl @cartadd="cartAdd" class="cartctl" :food="food"></cartctl>
+									<cartctl v-on:click.stop.prevent.self="cartAdd"  class="cartctl" :food="food"></cartctl>
 								</div>
 							</div>
 						</li>
@@ -43,6 +43,7 @@
 			</ul>
 		</div>
 		<shopcart ref="shopcart" :minPrice="seller.minPrice" :deliveryPrice="seller.deliveryPrice" :selected-food="selectedFood"></shopcart>
+		<food :foodData="currentFood" ref="foodDetail"></food>
 	</div>
 </template>
 <script>
@@ -50,9 +51,11 @@
 	import BScroll from 'better-scroll';
 	import shopcart from '../shopcart/shopcart';
 	import cartctl from '../cartctl/cartctl';
+	import food from '../food/food';
+
 	export default{
 		props: ['seller'],
-		components: { support, shopcart, cartctl },
+		components: { support, shopcart, cartctl, food },
 		data: function () {
 			return {
 				goods: [],
@@ -61,7 +64,8 @@
 				listHeight: [0],
 				menuHeight: [],
 				scrollY: 0,
-				menuScrollY: 0
+				menuScrollY: 0,
+				currentFood: Object
 			};
 		},
 		methods: {
@@ -112,30 +116,34 @@
 			},
 			cartAdd: function (el) {
 				this.$refs.shopcart.dropBall(el);
+			},
+			viewFoodDetail: function (food) {
+				this.currentFood = food;
+				this.$refs.foodDetail.showFoodDetail();
 			}
 		},
 		mounted: function () {
 			this.$nextTick(function () {
 				// 开发
-				let urlGoods = '/api/goods';
+				// let urlGoods = '/api/goods';
 				// 生产
-				// let urlGoods = 'http://liuzhuang.tech/eleme/data.json';
+				let urlGoods = 'http://liuzhuang.tech/eleme/data.json';
 				this.axios.get(urlGoods)
 				.then(res => {
 					// 开发
-					if (res.data.errno === 0) {
-						this.goods = res.data.data;
-						this.$nextTick(function () {
-							this.initScroll();
-							this.calcHeight();
-						});
-					}
+					// if (res.data.errno === 0) {
+					// 	this.goods = res.data.data;
+					// 	this.$nextTick(function () {
+					// 		this.initScroll();
+					// 		this.calcHeight();
+					// 	});
+					// }
 					// 生产
-					// this.goods = res.data.goods;
-					// this.$nextTick(function () {
-					// 	this.initScroll();
-					// 	this.calcHeight();
-					// });
+					this.goods = res.data.goods;
+					this.$nextTick(function () {
+						this.initScroll();
+						this.calcHeight();
+					});
 				})
 				.catch(function () {
 					console.log('get goods occur error...');
@@ -193,7 +201,7 @@
 
 		.menu-wrapper {
 			flex: 0 0 80px;
-			width: 0 0 80px;
+			width:80px;
 			background-color: #f3f5f7;
 			font-size: 12px;
 			color:rgb(240,20,20);

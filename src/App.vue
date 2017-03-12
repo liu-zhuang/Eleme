@@ -17,8 +17,10 @@
      </div>
    </section>
    <section>
-    <router-view :seller="seller"></router-view>
-  </section>
+     <keep-alive>
+      <router-view :seller="seller"></router-view>
+    </section>
+  </keep-alive>
 </div>
 </template>
 
@@ -34,18 +36,18 @@
     mounted: function () {
       this.$nextTick(function () {
         // 开发
-        var url = '/api/seller';
+        // var url = '/api/seller';
         // 生产
-        // var url = 'http://liuzhuang.tech/eleme/data.json';
+        var url = 'http://liuzhuang.tech/eleme/data.json';
         this.axios.get(url)
         .then(res => {
           // 开发
-          if (res.data.errno === 0) {
-            this.seller = res.data.data;
-          }
+          // if (res.data.errno === 0) {
+          //   this.seller = res.data.data;
+          // }
           // console.log(JSON.stringify(res.data.seller));
           // 生产
-          // this.seller = res.data.seller;
+          this.seller = res.data.seller;
         })
         .catch(function () {
           console.log('axios error...');
@@ -71,6 +73,7 @@
     height: 40px;
     line-height: 40px;
     border-bottom: solid 1px rgba(7,17,27,0.1);
+    z-index: 40;
   }
   #app .tab .tabItem{
     flex:1;

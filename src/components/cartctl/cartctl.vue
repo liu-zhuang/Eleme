@@ -14,13 +14,8 @@
 	</div>
 </template>
 <script>
-	import Vue from 'vue';
 	export default {
-		props: {
-			food: {
-				type: Object
-			}
-		},
+		props: ['food'],
 		methods: {
 			cartAdd: function (event) {
 				if (!event._constructed) {
@@ -29,7 +24,7 @@
 				if (this.food.cnt) {
 					this.food.cnt ++;
 				} else {
-					Vue.set(this.food, 'cnt', 1);
+					this.$set(this.food, 'cnt', 1);
 				}
 				this.$emit('cartadd', event.target);
 			},
