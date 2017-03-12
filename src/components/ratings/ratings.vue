@@ -124,6 +124,7 @@
 					// }
 					// 生产
 					this.ratings = res.data.ratings;
+					this.showRatings = this.ratings;
 					this.$nextTick(function () {
 						this.initScroll();
 					});
