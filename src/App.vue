@@ -19,8 +19,8 @@
    <section>
      <keep-alive>
       <router-view :seller="seller"></router-view>
+      </keep-alive>
     </section>
-  </keep-alive>
 </div>
 </template>
 
