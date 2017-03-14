@@ -1,5 +1,5 @@
 <template>
-	<transition name="detail">
+		<transition name="detail">
 		<div class="foodDetailScroll-wrapper" ref="foodDetail" v-show="showDetail" >
 			<div>
 				<div class="back" @click="hideDetail">
@@ -39,7 +39,8 @@
 				<split v-show="foodData.info"></split>
 				<ratingselect ref="ratingselect" :ratings="foodData.ratings" :tabs-content="tabsContent" @refreshScroll="refreshScroll"></ratingselect>
 			</div>
-		</transition>
+		</div>
+	</transition>
 	</template>
 	<script>
 		import BScroll from 'better-scroll';
